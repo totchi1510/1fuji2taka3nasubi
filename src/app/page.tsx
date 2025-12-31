@@ -3,6 +3,7 @@ import Image from "next/image";
 import { listRuns } from "@/lib/db";
 import { getOptionalEnv } from "@/lib/env";
 
+import { RunNowButton } from "./RunNow";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -21,10 +22,8 @@ export default function Home() {
           </div>
 
           <nav className={styles.ctas} aria-label="Actions">
-            <a className={styles.primary} href="/api/cron">
-              Run now
-            </a>
-            <a className={styles.secondary} href="/api/runs">
+            <RunNowButton className={styles.runNow} />
+            <a className={styles.secondary} href="/api/runs" target="_blank" rel="noreferrer">
               Runs JSON
             </a>
           </nav>
@@ -94,4 +93,3 @@ async function Gallery(props: {
     </>
   );
 }
-

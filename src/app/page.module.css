@@ -125,11 +125,78 @@ a.tertiary {
   opacity: 0.9;
 }
 
+.runNow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.runNow button {
+  appearance: none;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  cursor: pointer;
+  font-weight: 650;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, rgba(110, 231, 255, 0.28), rgba(167, 139, 250, 0.26));
+  transition: transform 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+}
+
+.runNow button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.runNow > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.runNow label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.runNow input {
+  height: 34px;
+  width: 190px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.runNow input:focus {
+  border-color: var(--border-strong);
+}
+
+.runNow div[role="status"] {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-left: 6px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .ctas a:hover {
     transform: translateY(-1px);
     border-color: var(--border-strong);
     opacity: 1;
+  }
+
+  .runNow button:hover {
+    transform: translateY(-1px);
+    border-color: var(--border-strong);
   }
 }
 
@@ -248,8 +315,15 @@ a.tertiary {
     margin-top: 0;
   }
 
+  .runNow {
+    flex-wrap: wrap;
+  }
+
+  .runNow input {
+    width: 160px;
+  }
+
   .intro h1 {
     font-size: 28px;
   }
 }
-
