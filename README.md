@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+1時間ごとに「nano banana（Gemini 画像生成）」へリクエストを送り、生成された「一富士二鷹三茄子」画像を Discord のスレッドへ投稿する Next.js アプリです（Vercel Cron 対応）。
 
-## Getting Started
+## 構成
 
-First, run the development server:
+- `GET /api/cron`: 画像生成 → Discord 投稿（Vercel Cron から1時間ごとに叩く）
+- `GET /api/runs`: 生成履歴の JSON（`DATABASE_URL` がある場合）
+- `vercel.json`: `0 * * * *`（毎時0分）で `/api/cron` を実行
+
+## 環境変数
+`.env.example` を参照してください。
+
+必須:
+- `DISCORD_WEBHOOK_URL`: Discord の Webhook URL
+- `GEMINI_API_KEY`: Gemini API Key（`@google/genai` 用）
+
+任意:
+- `DISCORD_THREAD_ID`: 既存スレッドへ投稿したい場合の thread id（未設定なら通常投稿）
+- `GEMINI_MODEL`: 画像生成できるモデル（デフォルト: `gemini-2.5-flash-image`）
+- `NANO_BANANA_PROMPT`: プロンプト上書き（未設定なら「一富士二鷹三茄子」固定）
+- `CRON_SECRET`: 設定した場合、`/api/cron` は `Authorization: Bearer <CRON_SECRET>` が必須
+- `DATABASE_URL`: 生成履歴（画像URL + 時刻）を保存してトップでギャラリー表示
+
+## nano banana（Gemini）の返り
+`@google/genai` の `generateContent` で返る `inlineData`（base64）から画像を取り出して Discord に添付します。
+
+## ローカル実行
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`CRON_SECRET` を設定している場合（推奨）、手動実行は以下のように叩けます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Vercel
+- Vercel にデプロイして環境変数を設定してください（`vercel.json` の Cron が自動で動きます）
