@@ -1,7 +1,8 @@
+import Image from "next/image";
+
 import { listRuns } from "@/lib/db";
 import { getOptionalEnv } from "@/lib/env";
 
-import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -11,22 +12,23 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <div className={styles.intro}>
-          <h1>一富士二鷹三茄子 Cron Bot</h1>
-          <p>
-            Vercel Cron が 1時間ごとに <code>/api/cron</code> を実行し、nano banana（Gemini）で生成した画像を Discord
-            のスレッドへ投稿します。
-          </p>
-        </div>
+        <header className={styles.intro}>
+          <div className={styles.titleBlock}>
+            <h1>一富士二鷹三茄子</h1>
+            <p>
+              Vercel Cron が <code>/api/cron</code> を1時間ごとに実行し、Gemini で生成した画像を Discord のスレッドへ投稿します。
+            </p>
+          </div>
 
-        <div className={styles.ctas}>
-          <a className={styles.primary} href="/api/cron">
-            Run /api/cron
-          </a>
-          <a className={styles.secondary} href="/api/runs">
-            Runs JSON
-          </a>
-        </div>
+          <nav className={styles.ctas} aria-label="Actions">
+            <a className={styles.primary} href="/api/cron">
+              Run now
+            </a>
+            <a className={styles.secondary} href="/api/runs">
+              Runs JSON
+            </a>
+          </nav>
+        </header>
 
         <Gallery runsPromise={runsPromise} databaseEnabled={Boolean(env.databaseUrl)} />
       </main>
@@ -40,56 +42,56 @@ async function Gallery(props: {
 }) {
   if (!props.databaseEnabled) {
     return (
-      <section className={styles.gallery} aria-label="Gallery">
-        <div className={styles.card}>
-          <div className={styles.meta}>
-            <div className={styles.time}>ギャラリー表示には `DATABASE_URL` が必要です</div>
-          </div>
+      <>
+        <div className={styles.sectionTitle}>
+          <h2>Collection</h2>
+          <span>`DATABASE_URL` を設定すると表示できます</span>
         </div>
-      </section>
+        <div className={styles.empty}>履歴を保存してコレクション表示するには `DATABASE_URL`（Neon/Postgres）を設定してください。</div>
+      </>
     );
   }
 
   const runs = await props.runsPromise;
-  if (runs.length === 0) {
-    return (
-      <section className={styles.gallery} aria-label="Gallery">
-        <div className={styles.card}>
-          <div className={styles.meta}>
-            <div className={styles.time}>まだ画像がありません（`/api/cron` を実行してください）</div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
-    <section className={styles.gallery} aria-label="Gallery">
-      {runs.map((run) => {
-        const date = new Date(run.created_at);
-        const time = Number.isNaN(date.getTime()) ? run.created_at : date.toLocaleString();
+    <>
+      <div className={styles.sectionTitle}>
+        <h2>Collection</h2>
+        <span>{runs.length} items</span>
+      </div>
 
-        return (
-          <article className={styles.card} key={run.id}>
-            <div className={styles.thumbWrap}>
-              <Image
-                className={styles.thumb}
-                src={run.image_url}
-                alt="一富士二鷹三茄子"
-                fill
-                sizes="(max-width: 600px) 50vw, 33vw"
-                priority={false}
-              />
-            </div>
-            <div className={styles.meta}>
-              <div className={styles.time}>{time}</div>
-              <a className={styles.smallLink} href={run.image_url} target="_blank" rel="noreferrer">
-                Open image
-              </a>
-            </div>
-          </article>
-        );
-      })}
-    </section>
+      {runs.length === 0 ? (
+        <div className={styles.empty}>まだ画像がありません。まずは `/api/cron` を実行してください。</div>
+      ) : (
+        <section className={styles.gallery} aria-label="Gallery">
+          {runs.map((run) => {
+            const date = new Date(run.created_at);
+            const time = Number.isNaN(date.getTime()) ? run.created_at : date.toLocaleString();
+
+            return (
+              <article className={styles.card} key={run.id}>
+                <div className={styles.thumbWrap}>
+                  <Image
+                    className={styles.thumb}
+                    src={run.image_url}
+                    alt="一富士二鷹三茄子"
+                    fill
+                    sizes="(max-width: 900px) 50vw, 33vw"
+                  />
+                </div>
+                <div className={styles.meta}>
+                  <div className={styles.time}>{time}</div>
+                  <a className={styles.smallLink} href={run.image_url} target="_blank" rel="noreferrer">
+                    Open image
+                  </a>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      )}
+    </>
   );
 }
+
