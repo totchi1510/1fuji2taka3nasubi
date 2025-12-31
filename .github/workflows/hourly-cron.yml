@@ -1,0 +1,28 @@
+name: Hourly Cron
+
+on:
+  schedule:
+    # GitHub Actions schedules run in UTC.
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/cron
+        env:
+          CRON_URL: ${{ secrets.CRON_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_URL" ]; then
+            echo "Missing CRON_URL secret (e.g. https://<your-app>.vercel.app/api/cron)"
+            exit 1
+          fi
+
+          if [ -n "$CRON_SECRET" ]; then
+            curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$CRON_URL"
+          else
+            curl -fsS "$CRON_URL"
+          fi
+

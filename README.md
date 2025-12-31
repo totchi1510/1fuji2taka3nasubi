@@ -4,7 +4,7 @@
 
 - `GET /api/cron`: 画像生成 → Discord 投稿（Vercel Cron から1時間ごとに叩く）
 - `GET /api/runs`: 生成履歴の JSON（`DATABASE_URL` がある場合）
-- `vercel.json`: `0 * * * *`（毎時0分）で `/api/cron` を実行
+  - Vercel Hobby の Cron は「1日1回」制限があるため、毎時実行したい場合は外部スケジューラを使います（下記）。
 
 ## 環境変数
 `.env.example` を参照してください。
@@ -37,4 +37,12 @@ curl -H "Authorization: Bearer <CRON_SECRET>" http://localhost:3000/api/cron
 ```
 
 ## Vercel
-- Vercel にデプロイして環境変数を設定してください（`vercel.json` の Cron が自動で動きます）
+- Vercel にデプロイして環境変数を設定してください
+
+## 毎時実行（Vercel Hobby 回避）
+おすすめは GitHub Actions のスケジュールで `/api/cron` を叩く方法です。
+
+- 追加済み: `.github/workflows/hourly-cron.yml`（UTC基準で `0 * * * *`）
+- GitHub のリポジトリ設定で Secrets を追加
+  - `CRON_URL`: `https://<your-app>.vercel.app/api/cron`
+  - `CRON_SECRET`: `CRON_SECRET` を設定している場合のみ（推奨）
